@@ -10,7 +10,11 @@ int main(int argc, char *argv[]) {
 	 /*************************************************
 		 Definición de "old" y resto de variables
 		**************************************************/
-
+   
+   // Modificado por mi
+   int **old;
+   //fin modificado
+   
    /*  Controla que se haya ingresado un argumento en la llamada */
 		if (argc != 2){ 
       printf("Error: Debe indicar el nombre del archivo de entrada\nEj: $./a.out entrada1.cells\n");
@@ -37,7 +41,13 @@ int main(int argc, char *argv[]) {
 		 ...
         
 		**************************************************/
-
+   // Modificado por mi
+   old = (int **)malloc((rows + 2)*sizeof(int*)); 
+	
+   for (i=0;i<(rows + 2);i++) 
+     old[i] = (int*)malloc((cols + 2)*sizeof(int));
+   //fin modificado
+   
 
    /*  inicializar elementos con 0 o 1 en matriz llamada "old" */
    s = malloc(cols + 1);
@@ -63,4 +73,10 @@ int main(int argc, char *argv[]) {
         
 		**************************************************/
 
+   for (i = 0; i < rows + 2; i++){
+     for (j = 0; j < cols + 2; j++){
+       printf("%d ", old[i][j]);
+     }
+     printf("\n");
+   }
 }
