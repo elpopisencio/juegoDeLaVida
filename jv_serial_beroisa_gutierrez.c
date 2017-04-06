@@ -1,63 +1,22 @@
+// Integrantes: Beroisa Jorge, Gutierrez Jeremias.
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-
-void viejo(char** old, char** new, int rows, int cols){
-  int i, j, suma;
-
-
-  
-  for (j = 1; j < cols + 1; j++){
-    old[0][j] = old[rows][j];
-    old[rows + 1][j] = old[1][j];
-  }
-  for (i = 1; i < rows + 1; i++){
-    old[i][0] = old[i][cols];
-    old[i][cols + 1] = old[i][1];
-  }
-  old[0][0] = old[rows][cols];
-  old[0][cols + 1] = old[rows][1];
-  old[rows + 1][0] = old[1][cols];
-  old[rows + 1][cols + 1] = old[1][1];
-
-  
-  for (i = 0; i < rows + 2; i++){
-    for (j = 0; j < cols + 2; j++){
-      if(i != 0 && j != 0 && i != rows + 1 && j != cols + 1){
-	suma = 0;
-	suma += old[i-1][j-1];
-	suma += old[i-1][j];
-	suma += old[i][j-1];
-	suma += old[i+1][j+1];
-	suma += old[i+1][j];
-	suma += old[i][j+1];
-	suma += old[i+1][j-1];
-	suma += old[i-1][j+1];
-	  
-	if (suma == 3){
-	  new[i][j] = 1;
-	}else{
-	  if (old[i][j] == 1 && suma == 2){
-	    new[i][j] = 1;
-	  } else{
-	    new[i][j] = 0;
-	  }
-	}
-      } else{
-	new[i][j] = 0;
-      }
-    }     
-  }
-
-}
-
-
 void mejorado(char** old, char** new, int rows, int cols){
   int i, j;
-
+  /* Este metodo recorre la matriz old buscando celulas vivas, cuando
+     encuentra una, suma uno a cada celula vecina en la matriz new, que debe
+     ser ingresada con todos sus valores en 0.
+     Luego, recorre la matriz verificando si la cantidad de celulas vivas
+     vecinas y el estado en la matriz old, hace que se mantengan vivas en el 
+     nuevo estado, que es guardado en la matriz new, mientras que la matriz old
+     queda con todos sus elementos en 0.
+   */
+  
   // Recorro la primer fila:
-
+  // Verifico el primer elemento de la primer fila:
   if (old[1][1] == 1){
     new[rows][cols] += 1;
     new[rows][1] += 1;
@@ -70,7 +29,7 @@ void mejorado(char** old, char** new, int rows, int cols){
     new[2][1] += 1;
     new[2][2] += 1;
   }
-  
+  // Verifico los elementos intermedios
   for (j = 2; j < cols; j++){
  
     if (old[1][j] == 1){
@@ -86,7 +45,7 @@ void mejorado(char** old, char** new, int rows, int cols){
       new[2][j+1] += 1;
     }
   }
-
+  // Verifico el ultimo elemento de la primer fila
   if (old[1][cols] == 1){
     new[rows][cols - 1] += 1;
     new[rows][cols] += 1;
@@ -102,7 +61,7 @@ void mejorado(char** old, char** new, int rows, int cols){
   
   // Recorro las filas intermedias:
   for (i = 2; i < rows; i++){
-    // Verifico el primer elemento de la fila:
+    // Verifico el primer elemento de la fila i:
     if (old[i][1] == 1){
       new[i-1][cols] += 1;
       new[i-1][1] += 1;      
@@ -117,7 +76,7 @@ void mejorado(char** old, char** new, int rows, int cols){
     
     }
 
-    // Verifico los intermedios:
+    // Verifico los intermedios de la fila i:
     for (j = 2; j < cols; j++){
  
       if (old[i][j] == 1){
@@ -133,7 +92,7 @@ void mejorado(char** old, char** new, int rows, int cols){
 	new[i+1][j+1] += 1;
       }
     }
-    // Verifico el ultimo elemento de la fila:
+    // Verifico el ultimo elemento de la fila i:
     if (old[i][cols] == 1){
       new[i-1][cols - 1] += 1;
       new[i-1][cols] += 1;      
@@ -151,7 +110,7 @@ void mejorado(char** old, char** new, int rows, int cols){
 
 
   // Recorro la ultima fila:
-
+  // verifico el primer elemento de la ultima fila:
   if (old[rows][1] == 1){
     new[rows - 1][cols] += 1;
     new[rows - 1][1] += 1;
@@ -164,7 +123,7 @@ void mejorado(char** old, char** new, int rows, int cols){
     new[1][1] += 1;
     new[1][2] += 1;
   }
-
+  //verifico los elementos intermedios de la ultima fila:
   for (j = 2; j < cols; j++){
     if (old[rows][j] == 1){
       new[rows - 1][j-1] += 1;
@@ -179,7 +138,7 @@ void mejorado(char** old, char** new, int rows, int cols){
       new[1][j+1] += 1;
     }
   }
-
+  // Verifico el ultimo elemento de la ultima fila:
   if (old[rows][cols] == 1){
     new[rows - 1][cols-1] += 1;
     new[rows - 1][cols] += 1;
@@ -192,30 +151,20 @@ void mejorado(char** old, char** new, int rows, int cols){
     new[1][cols] += 1;
     new[1][1] += 1;
   }
-
-
-
+  // Recorro la matriz new que contiene la cantidad de vecinos de cada celula
+  // en el estado anterior y actualizo si debe vivir o morir en el nuevo estado
   for (i = 1; i < rows + 1; i++){
     for (j = 1; j < cols + 1; j++){
-    
-      if (new[i][j] == 3){
+      if (new[i][j] == 3 || (new[i][j] == 2 && old[i][j] == 1)){
 	new[i][j] = 1;
 	old[i][j] = 0;
       } else{
-	if (new[i][j] == 2 && old[i][j] == 1){
-	  new[i][j] = 1;
-	  old[i][j] = 0;
-	} else{
 	  new[i][j] = 0;
 	  old[i][j] = 0;
-	}
       }
-    
     }
   }
-
 }
-
 
 int main(int argc, char *argv[]) {
   FILE *f;
@@ -228,10 +177,8 @@ int main(int argc, char *argv[]) {
    
   // Modificado por mi
   int suma;
-  char **oldv;
-  char **oldm;
-  char **newv;
-  char **newm;
+  char **old;
+  char **new;
   char **aux;
   int a;
   //fin modificado
@@ -253,11 +200,7 @@ int main(int argc, char *argv[]) {
     printf("Error: formato de archivo incorrecto\n");
     return 1;
   }
-
   printf("cols %d\nrows %d\nsteps %d\n", cols, rows, steps);
-
-
-
 
   /*************************************************
 		 Aquí debería asignarse memoria a las matrices
@@ -266,12 +209,12 @@ int main(int argc, char *argv[]) {
         
   **************************************************/
   // Modificado por mi
-  oldv = malloc(((rows + 2) * 2)*sizeof(char*)); 
+  old = malloc(((rows + 2) * 2)*sizeof(char*)); 
 
-  if(oldv != NULL){
+  if(old != NULL){
     for (i=0;i<((rows + 2) * 2);i++){ 
-      oldv[i] = malloc((cols + 2)*sizeof(char));
-      if(oldv[i] == NULL){
+      old[i] = malloc((cols + 2)*sizeof(char));
+      if(old[i] == NULL){
 	printf("No hay memoria");
 	return 1;
       }
@@ -281,117 +224,45 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  oldm = malloc(((rows + 2) * 2)*sizeof(char*)); 
-
-  if(oldm != NULL){
-    for (i=0;i<((rows + 2) * 2);i++){ 
-      oldm[i] = malloc((cols + 2)*sizeof(char));
-      if(oldm[i] == NULL){
-	printf("No hay memoria");
-	return 1;
-      }
-    }
-  } else {
-    printf("No hay memoria");
-    return 1;
-  }
-
-
-  
-  newv = oldv + rows + 2;
-  newm = oldm + rows + 2;
+  new = old + rows + 2;
   nrows = (rows + 2) * 2;
   ncols = cols;
         
   //fin modificado
-  
+   
 
   /*  inicializar elementos con 0 o 1 en matriz llamada "old" */
   s = malloc(cols + 1);
-  res = fgets(s, cols, f);
+  res = fgets(s, cols + 2, f);
   i = 1;
   while (res != NULL) {
     for (j = 0; j < strlen(s) - 1; j++)
-      oldm[i][j+1] = (s[j] == '.') ? 0 : 1;
+      old[i][j+1] = (s[j] == '.') ? 0 : 1;
     for (j = strlen(s) - 1; j < cols; j++)
-      oldm[i][j+1] = 0;
+      old[i][j+1] = 0;
     res = fgets(s, cols, f);
     i++;
   };
   for (j = i; j < nrows; j++)
-    bzero(oldm[j], ncols);
+    bzero(old[j], ncols);
   fclose(f);
   free(s);
-
-  
-  for (i = 1; i < rows + 1; i++){
-    for (j = 1; j < cols + 1; j++){
-      oldv[i][j] = oldm[i][j]; 
-    }
-  }  
-  
   /*************************************************
 		 Resto del programa
  		 ...
 		 ...
         
   **************************************************/
-
-  /*
-  for (i = 0; i < rows + 2; i++){
-    for (j = 0; j < cols + 2; j++){
-      printf("%c",  (oldv[i][j] == 0) ? '.' : 'O');
-    }
-     
-    printf("\n");
-  }
-
-  */
-  
-  
   for(a = 0; a < steps; a++){
-  
-    viejo(oldv, newv, rows, cols);
-    
-      mejorado(oldm, newm, rows, cols);
-      for (i = 1; i < rows + 1; i++){
-      for (j = 1; j < cols + 1; j++){
-      if (newm[i][j] != newv[i][j]){
-      printf("super error en el ciclo  %d \nEn la fila: %d, columna %d \n", a, i, j);
-      return 1;
-      }
-      }
-      }
-      aux = newm;
-      newm = oldm;
-      oldm = aux;
-    
-    for (i = 1; i < rows + 1; i++){
-      for (j = 1; j < cols + 1; j++){
-	printf("%c",  (newv[i][j] == 0) ? '.' : 'O');
-      }
-     
-      printf("\n");
-    }
-    aux = newv;
-    newv = oldv;
-    oldv = aux; 
+    mejorado(old, new, rows, cols);
+    aux = new;
+    new = old;
+    old = aux;
   }
-  
-  if (steps % 2 == 1){
-
-    aux = newm;
-    newm = oldm;
-    oldm = aux;    
-  }
-
-  
   for (i = 1; i < rows + 1; i++){
     for (j = 1; j < cols + 1; j++){
-      printf("%c",  (newv[i][j] == 0) ? '.' : 'O');
+      printf("%c",  (old[i][j] == 0) ? '.' : 'O');
     }
-     
     printf("\n");
   }
-  
 }
