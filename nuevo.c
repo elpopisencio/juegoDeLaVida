@@ -15,7 +15,8 @@ void mejorado(char** old, char** new, int rows, int cols){
      nuevo estado, que es guardado en la matriz new, mientras que la matriz old
      queda con todos sus elementos en 0.
    */
-  __m128i res, ressig, f1, f2, f2sig, f3, aux1, aux2;
+  __m128i sumacolant, sumacol, sumacolsig,res, resaux, ressig, resant, f1, f2, f2aux, f3, aux;
+  //Copia bordes
   for (j = 1; j < cols + 1; j++){
     old[0][j] = old[rows][j];
     old[rows + 1][j] = old[1][j];
@@ -29,57 +30,74 @@ void mejorado(char** old, char** new, int rows, int cols){
   old[rows + 1][0] = old[1][cols];
   old[rows + 1][cols + 1] = old[1][1];
 
-  for (i = 1; i < rows + 1; i++){
+   for (i = 1; i < rows + 1; i++){
+  
+  //primer vector
     f1 = _mm_load_si128((__m128i*)(old[i-1]+0));
     f2 = _mm_load_si128((__m128i*)(old[i]+0));
     f3 = _mm_load_si128((__m128i*)(old[i+1]+0));
-    res = _mm_add_epi8 (f1, f2);
-    res = _mm_add_epi8 (res, f3);
+    aux = _mm_add_epi8 (f1, f2);
+    sumacol = _mm_add_epi8 (aux, f3);
     //siguiente
-    f1 = _mm_load_si128((__m128i*)(old[i-1]+1));
-    f2 = _mm_load_si128((__m128i*)(old[i]+1));
-    f3 = _mm_load_si128((__m128i*)(old[i+1]+1));
-    ressig = _mm_add_epi8 (f1, f2);
-    ressig = _mm_add_epi8 (res, f3);
+    f1 = _mm_load_si128((__m128i*)(old[i-1]+16));
+    f2aux = _mm_load_si128((__m128i*)(old[i]+16));
+    f3 = _mm_load_si128((__m128i*)(old[i+1]+16));
+    aux = _mm_add_epi8 (f1, f2aux);
+    sumacolsig = _mm_add_epi8 (aux, f3);
     
-    aux1 =  _mm_slli_si128 (res, 1);
-    res = _mm_add_epi8 (res, aux1);
-    aux1 = _mm_srli_si128 (ressig, 15);
+    aux =  _mm_srli_si128 (sumacol, 1);
+    resaux = _mm_add_epi8 (sumacol, aux);
+    aux = _mm_slli_si128 (sumacolsig, 15);
+    resaux = _mm_add_epi8 (resaux, aux);
+    aux =  _mm_slli_si128 (sumacol, 1);
+    resaux = _mm_add_epi8 (resaux, aux);
     
-    aux2 =  _mm_srli_si128 (res, 1);
-
-
-    
-   
-    res = _mm_add_epi8 (res, aux2);
-    res = _mm_sub_epi8 (res, f2);
+    res = _mm_sub_epi8 (resaux, f2);
     _mm_store_si128((__m128i*)(new[i]+0), res);
-    for (j = 1; j < cols -16; j = j + 16){
-      f1 = _mm_load_si128((__m128i*)(old[i-1]+j));
-      f2 = _mm_load_si128((__m128i*)(old[i]+j));
-      f3 = _mm_load_si128((__m128i*)(old[i+1]+j));
-      res = _mm_add_epi8 (f1, f2);
-      res = _mm_add_epi8 (res, f3);
-      aux1 =  _mm_slli_si128 (res, 1);
-      aux2 =  _mm_srli_si128 (res, 1);
-      res = _mm_add_epi8 (res, aux1);
-      res = _mm_add_epi8 (res, aux2);
-      res = _mm_sub_epi8 (res, f2);
+    
+    for (j = 16; j < cols - 16; j = j + 16){
+      //anterior
+      sumacolant = sumacol;
+      //primer vector
+      sumacol = sumacolsig;
+      f2 = f2aux;
+      //siguiente
+      f1 = _mm_load_si128((__m128i*)(old[i-1]+j+16));
+      f2aux = _mm_load_si128((__m128i*)(old[i]+j+16));
+      f3 = _mm_load_si128((__m128i*)(old[i+1]+j+16));
+      aux = _mm_add_epi8 (f1, f2aux);
+      sumacolsig = _mm_add_epi8 (aux, f3);
+   
+      aux =  _mm_srli_si128 (sumacol, 1);
+      resaux = _mm_add_epi8 (sumacol, aux);
+      aux = _mm_slli_si128 (sumacolsig, 15);
+      resaux = _mm_add_epi8 (resaux, aux);
+      aux =  _mm_slli_si128 (sumacol, 1);
+      resaux = _mm_add_epi8 (resaux, aux);
+      aux =  _mm_srli_si128 (sumacolant, 15);
+      resaux = _mm_add_epi8 (resaux, aux);
+
+      
+      res = _mm_sub_epi8 (resaux, f2);
       _mm_store_si128((__m128i*)(new[i]+j), res);
     }
-    f1 = _mm_load_si128((__m128i*)(old[i-1]+j));
-      f2 = _mm_load_si128((__m128i*)(old[i]+j));
-      f3 = _mm_load_si128((__m128i*)(old[i+1]+j));
-      res = _mm_add_epi8 (f1, f2);
-      res = _mm_add_epi8 (res, f3);
-      aux1 =  _mm_slli_si128 (res, 1);
-      aux2 =  _mm_srli_si128 (res, 1);
-      res = _mm_add_epi8 (res, aux1);
-      res = _mm_add_epi8 (res, aux2);
-      res = _mm_sub_epi8 (res, f2);
+      //anterior
+      sumacolant = sumacol;
+      //primer vector
+      sumacol = sumacolsig;
+      f2 = f2aux;
+   
+      aux =  _mm_srli_si128 (sumacol, 1);
+      resaux = _mm_add_epi8 (sumacol, aux);
+      aux =  _mm_slli_si128 (sumacol, 1);
+      resaux = _mm_add_epi8 (resaux, aux);
+      aux =  _mm_srli_si128 (sumacolant, 15);
+      resaux = _mm_add_epi8 (resaux, aux);
+      
+      res = _mm_sub_epi8 (resaux, f2);
       _mm_store_si128((__m128i*)(new[i]+j), res);
-  }
 
+   }
   for (i = 1; i < rows + 1; i++){
     for (j = 1; j < cols + 1; j++){
       printf("%d",  new[i][j]);
@@ -194,7 +212,7 @@ int main(int argc, char *argv[]) {
     printf("\n");
   }
   // for(a = 0; a < steps; a++){
-    mejorado(old, new, rows, cols);
+  mejorado(old, new, rows, cols);
     aux = new;
     new = old;
     old = aux;
