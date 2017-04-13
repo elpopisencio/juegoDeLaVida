@@ -98,17 +98,29 @@ void mejorado(char** old, char** new, int rows, int cols){
       _mm_store_si128((__m128i*)(new[i]+j), res);
 
    }
-  for (i = 1; i < rows + 1; i++){
-    for (j = 1; j < cols + 1; j++){
-      printf("%d",  new[i][j]);
-    }
-    printf("\n");
-  }
 
   // Recorro la matriz new que contiene la cantidad de vecinos de cada celula
   // en el estado anterior y actualizo si debe vivir o morir en el nuevo estado
   for (i = 1; i < rows + 1; i++){
+    for (j = 0; j < cols; j = j + 16){
+      f1 = _mm_load_si128((__m128i*)(new[i]+j));
+      f3 = _mm_load_si128((__m128i*)(old[i]+j));
+      f2 = _mm_set1_epi8(3);
+      resaux = _mm_cmpeq_epi8(f1, f2);
+      f2 = _mm_set1_epi8(2);
+      res = _mm_cmpeq_epi8(f1, f2);
+      f2 = _mm_set1_epi8(1);
+      ressig = _mm_cmpeq_epi8(f3, f2);
+      res = _mm_and_si128 (res, ressig);
+      res = _mm_add_epi8 (res, resaux);
+      f2 = _mm_set1_epi8(1);
+      res = _mm_and_si128 (res, f2);
+
+      _mm_store_si128((__m128i*)(new[i]+j), res);
+    }
+    /*
     for (j = 1; j < cols + 1; j++){
+
       if (new[i][j] == 3 || (new[i][j] == 2 && old[i][j] == 1)){
 	new[i][j] = 1;
 	old[i][j] = 0;
@@ -117,6 +129,7 @@ void mejorado(char** old, char** new, int rows, int cols){
 	  old[i][j] = 0;
       }
     }
+    */
   }
 }
 
@@ -205,18 +218,13 @@ int main(int argc, char *argv[]) {
 		 ...
         
   **************************************************/
-  for (i = 1; i < rows + 1; i++){
-    for (j = 1; j < cols + 1; j++){
-      printf("%c",  (old[i][j] == 0) ? '.' : 'O');
-    }
-    printf("\n");
-  }
-  // for(a = 0; a < steps; a++){
+ 
+ for(a = 0; a < steps; a++){
   mejorado(old, new, rows, cols);
     aux = new;
     new = old;
     old = aux;
-    //}
+}
   for (i = 1; i < rows + 1; i++){
     for (j = 1; j < cols + 1; j++){
       printf("%c",  (old[i][j] == 0) ? '.' : 'O');
