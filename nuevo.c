@@ -53,7 +53,22 @@ void mejorado(char** old, char** new, int rows, int cols){
     resaux = _mm_add_epi8 (resaux, aux);
     
     res = _mm_sub_epi8 (resaux, f2);
-    _mm_store_si128((__m128i*)(new[i]+0), res);
+
+    f1 = res;
+      f3 = _mm_set1_epi8(3);
+      resaux = _mm_cmpeq_epi8(f1, f3);
+      f3 = _mm_set1_epi8(2);
+      res = _mm_cmpeq_epi8(f1, f3);
+      f3 = _mm_set1_epi8(1);
+      ressig = _mm_cmpeq_epi8(f3, f2);
+      res = _mm_and_si128 (res, ressig);
+      res = _mm_add_epi8 (res, resaux);
+      f3 = _mm_set1_epi8(1);
+      res = _mm_and_si128 (res, f3);
+      _mm_store_si128((__m128i*)(new[i]+0), res);
+
+
+
     
     for (j = 16; j < cols - 16; j = j + 16){
       //anterior
@@ -79,7 +94,21 @@ void mejorado(char** old, char** new, int rows, int cols){
 
       
       res = _mm_sub_epi8 (resaux, f2);
+
+      f1 = res;
+      f3 = _mm_set1_epi8(3);
+      resaux = _mm_cmpeq_epi8(f1, f3);
+      f3 = _mm_set1_epi8(2);
+      res = _mm_cmpeq_epi8(f1, f3);
+      f3 = _mm_set1_epi8(1);
+      ressig = _mm_cmpeq_epi8(f3, f2);
+      res = _mm_and_si128 (res, ressig);
+      res = _mm_add_epi8 (res, resaux);
+      f3 = _mm_set1_epi8(1);
+      res = _mm_and_si128 (res, f3);
       _mm_store_si128((__m128i*)(new[i]+j), res);
+
+
     }
       //anterior
       sumacolant = sumacol;
@@ -95,42 +124,48 @@ void mejorado(char** old, char** new, int rows, int cols){
       resaux = _mm_add_epi8 (resaux, aux);
       
       res = _mm_sub_epi8 (resaux, f2);
+
+      f1 = res;
+      f3 = _mm_set1_epi8(3);
+      resaux = _mm_cmpeq_epi8(f1, f3);
+      f3 = _mm_set1_epi8(2);
+      res = _mm_cmpeq_epi8(f1, f3);
+      f3 = _mm_set1_epi8(1);
+      ressig = _mm_cmpeq_epi8(f3, f2);
+      res = _mm_and_si128 (res, ressig);
+      res = _mm_add_epi8 (res, resaux);
+      f3 = _mm_set1_epi8(1);
+      res = _mm_and_si128 (res, f3);
       _mm_store_si128((__m128i*)(new[i]+j), res);
+  
+
+      
 
    }
 
   // Recorro la matriz new que contiene la cantidad de vecinos de cada celula
   // en el estado anterior y actualizo si debe vivir o morir en el nuevo estado
-  for (i = 1; i < rows + 1; i++){
+   /*
+   for (i = 1; i < rows + 1; i++){
     for (j = 0; j < cols; j = j + 16){
       f1 = _mm_load_si128((__m128i*)(new[i]+j));
-      f3 = _mm_load_si128((__m128i*)(old[i]+j));
-      f2 = _mm_set1_epi8(3);
-      resaux = _mm_cmpeq_epi8(f1, f2);
-      f2 = _mm_set1_epi8(2);
-      res = _mm_cmpeq_epi8(f1, f2);
-      f2 = _mm_set1_epi8(1);
+      f2 = _mm_load_si128((__m128i*)(old[i]+j));
+      f3 = _mm_set1_epi8(3);
+      resaux = _mm_cmpeq_epi8(f1, f3);
+      f3 = _mm_set1_epi8(2);
+      res = _mm_cmpeq_epi8(f1, f3);
+      f3 = _mm_set1_epi8(1);
       ressig = _mm_cmpeq_epi8(f3, f2);
       res = _mm_and_si128 (res, ressig);
       res = _mm_add_epi8 (res, resaux);
-      f2 = _mm_set1_epi8(1);
-      res = _mm_and_si128 (res, f2);
+      f3 = _mm_set1_epi8(1);
+      res = _mm_and_si128 (res, f3);
 
       _mm_store_si128((__m128i*)(new[i]+j), res);
     }
-    /*
-    for (j = 1; j < cols + 1; j++){
-
-      if (new[i][j] == 3 || (new[i][j] == 2 && old[i][j] == 1)){
-	new[i][j] = 1;
-	old[i][j] = 0;
-      } else{
-	  new[i][j] = 0;
-	  old[i][j] = 0;
-      }
-    }
-    */
-  }
+   
+   }
+   */
 }
 
 int main(int argc, char *argv[]) {
