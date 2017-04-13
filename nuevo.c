@@ -18,10 +18,10 @@ void mejorado(char** old, char** new, int rows, int cols){
   __m128i sumacolant, sumacol, sumacolsig,res, resaux, ressig, resant, f1, f2, f2aux, f3, aux;
   //Copia bordes
   for (j = 0; j < cols; j = j + 16){
-    old[0][j] = old[rows][j];
+
     f1 = _mm_load_si128((__m128i*)(old[rows]+j));
     _mm_store_si128((__m128i*)(old[0]+j), f1);
-    old[rows + 1][j] = old[1][j];
+
     f1 = _mm_load_si128((__m128i*)(old[1]+j));
     _mm_store_si128((__m128i*)(old[rows + 1]+j), f1);
 
@@ -143,30 +143,6 @@ void mejorado(char** old, char** new, int rows, int cols){
       res = _mm_and_si128 (res, f3);
       _mm_store_si128((__m128i*)(new[i]+j), res);  
    }
-
-  // Recorro la matriz new que contiene la cantidad de vecinos de cada celula
-  // en el estado anterior y actualizo si debe vivir o morir en el nuevo estado
-   /*
-   for (i = 1; i < rows + 1; i++){
-    for (j = 0; j < cols; j = j + 16){
-      f1 = _mm_load_si128((__m128i*)(new[i]+j));
-      f2 = _mm_load_si128((__m128i*)(old[i]+j));
-      f3 = _mm_set1_epi8(3);
-      resaux = _mm_cmpeq_epi8(f1, f3);
-      f3 = _mm_set1_epi8(2);
-      res = _mm_cmpeq_epi8(f1, f3);
-      f3 = _mm_set1_epi8(1);
-      ressig = _mm_cmpeq_epi8(f3, f2);
-      res = _mm_and_si128 (res, ressig);
-      res = _mm_add_epi8 (res, resaux);
-      f3 = _mm_set1_epi8(1);
-      res = _mm_and_si128 (res, f3);
-
-      _mm_store_si128((__m128i*)(new[i]+j), res);
-    }
-   
-   }
-   */
 }
 
 int main(int argc, char *argv[]) {
