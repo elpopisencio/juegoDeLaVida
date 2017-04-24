@@ -4,17 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <emmintrin.h>
+#include <omp.h>
 
 void mejorado(char** old, char** new, int rows, int cols){
   int i, j;
-  /* Este metodo recorre la matriz old buscando celulas vivas, cuando
-     encuentra una, suma uno a cada celula vecina en la matriz new, que debe
-     ser ingresada con todos sus valores en 0.
-     Luego, recorre la matriz verificando si la cantidad de celulas vivas
-     vecinas y el estado en la matriz old, hace que se mantengan vivas en el 
-     nuevo estado, que es guardado en la matriz new, mientras que la matriz old
-     queda con todos sus elementos en 0.
-   */
   __m128i sumacolant, sumacol, sumacolsig,res, resaux, ressig, resant, f1, f2, f2aux, f3, aux;
   //Copia bordes
   for (j = 0; j < cols; j = j + 16){
@@ -36,6 +29,8 @@ void mejorado(char** old, char** new, int rows, int cols){
   old[rows + 1][0] = old[1][cols];
   old[rows + 1][cols + 1] = old[1][1];
 
+#pragma omp parallel for private (sumacolant, sumacol, sumacolsig,res, resaux, ressig, resant, f1, f2, f2aux, f3, aux, j)
+    
    for (i = 1; i < rows + 1; i++){
   
   //primer vector
