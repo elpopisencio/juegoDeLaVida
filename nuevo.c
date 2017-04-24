@@ -238,5 +238,17 @@ int main(int argc, char *argv[]) {
     }
     printf("\n");
   }
+  
+  free(old);
+  
   return 0;
 }
+
+/**
+ openmp sin shedule con intel i5 750 @ 2.67 GHz, 4 cores:
+ 
+real	0m1.919s
+user	0m7.564s
+sys	0m0.032s  
+
+ */
