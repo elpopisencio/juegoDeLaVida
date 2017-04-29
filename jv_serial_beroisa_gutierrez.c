@@ -4,6 +4,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct viva{
+  int x;
+  int y;
+  struct viva* sig;
+} viva_t;
+
 void mejorado(char** old, char** new, int rows, int cols){
   int i, j;
   /* Este metodo recorre la matriz old buscando celulas vivas, cuando
@@ -235,14 +241,35 @@ int main(int argc, char *argv[]) {
   s = malloc(cols + 1);
   res = fgets(s, cols + 2, f);
   i = 1;
+  struct vive_t * root = NULL;
+  struct Viva* aux2 = root;
+  v.x = 1;
+  v.y = 2;
+  struct Viva v;  
   while (res != NULL) {
     for (j = 0; j < strlen(s) - 1; j++)
-      old[i][j+1] = (s[j] == '.') ? 0 : 1;
+      if(s[j] == '.'){
+	old[i][j+1] = 0;
+      } else{
+	old[i][j+1] = 1;
+	root = malloc(sizeof(viva_t));
+	/*
+	struct viva v1;
+	v.x = i;
+	v.y = j;
+	v.sig = &v1;
+	v = v1;
+	*/
+      }
+    // old[i][j+1] = (s[j] == '.') ? 0 : 1;
     for (j = strlen(s) - 1; j < cols; j++)
       old[i][j+1] = 0;
     res = fgets(s, cols, f);
     i++;
   };
+
+  v.sig = 0;
+  
   for (j = i; j < nrows; j++)
     bzero(old[j], ncols);
   fclose(f);
@@ -253,16 +280,26 @@ int main(int argc, char *argv[]) {
 		 ...
         
   **************************************************/
+  struct viva* aux2 = root;
+  while(aux2 != 0){
+    v = *root;
+    printf("x = %d, y = %d \n", v.x, v.y); 
+    aux2 = v.sig;
+  }
+  /*
   for(a = 0; a < steps; a++){
     mejorado(old, new, rows, cols);
     aux = new;
     new = old;
     old = aux;
   }
+  */
   for (i = 1; i < rows + 1; i++){
     for (j = 1; j < cols + 1; j++){
       printf("%c",  (old[i][j] == 0) ? '.' : 'O');
     }
     printf("\n");
   }
+  
+  return 0;
 }
