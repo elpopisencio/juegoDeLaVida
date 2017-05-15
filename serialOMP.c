@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <emmintrin.h>
+#include <omp.h>
 
 
 void viejo(char** old, char** new, int rows, int cols){
@@ -102,10 +104,15 @@ void actualizar(char** old, int** viv2, int rows, int cols, int i, int j){
 void mejor(char** old, int** viv1, int** viv2, int rows, int cols){
   int i, j;    
 
+#pragma omp parallel for  schedule (static)
+  
   for (j = 1; j < cols + 1; j++){
     old[0][j] = old[rows][j];
     old[rows + 1][j] = old[1][j];
   }
+
+  #pragma omp parallel for  schedule (static)
+  
   for (i = 1; i < rows + 1; i++){
     old[i][0] = old[i][cols];
     old[i][cols + 1] = old[i][1];
@@ -114,10 +121,13 @@ void mejor(char** old, int** viv1, int** viv2, int rows, int cols){
   old[0][cols + 1] = old[rows][1];
   old[rows + 1][0] = old[1][cols];
   old[rows + 1][cols + 1] = old[1][1];
-  
+
+  #pragma omp parallel for  schedule (static)
   for(i = 1; i <= rows; i++){
     viv2[i][0] = 0;
   }
+
+#pragma omp parallel for private (j) schedule (static)
   
   for(i = 1; i <= rows; i++){  
     for(j = 1; j <= viv1[i][0]; j++){
@@ -144,11 +154,13 @@ void mejor(char** old, int** viv1, int** viv2, int rows, int cols){
       printf("\n");
     }
  */
- 
+ #pragma omp parallel for  schedule (static)
   for(j = 1; j <= cols; j++){
     old[1][j] = 0;
     old[rows][j] = 0;
   }
+
+#pragma omp parallel for private (j) schedule (static)
   for(i = 1; i <= rows; i++){  
     old[i][1] = 0;
     old[i][cols] = 0;
@@ -175,6 +187,8 @@ void mejor(char** old, int** viv1, int** viv2, int rows, int cols){
       printf("\n");
     }
   */
+
+#pragma omp parallel for private(j) schedule (static)
   for(i = 1; i <= rows; i++){  
     for(j = 1; j <= viv2[i][0]; j++){
       old[ i ][ viv2[i][j] ] = 1;
@@ -302,11 +316,11 @@ int main(int argc, char *argv[]) {
   
   for(a = 0; a < steps; a++){
     
-    //viejo(old, new, rows, cols);
+    // viejo(old, new, rows, cols);
     mejor(old, viv1, viv2, rows, cols);
 
 
-    /*  
+    /*   
     for(i=1; i<rows+1; i++){
       for(j=1; j<cols+1; j++){
 	  if(old[i][j] != new[i][j]){

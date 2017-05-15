@@ -29,7 +29,7 @@ void mejorado(char** old, char** new, int rows, int cols){
   old[rows + 1][0] = old[1][cols];
   old[rows + 1][cols + 1] = old[1][1];
 
-  //#pragma omp parallel for private (sumacolant, sumacol, sumacolsig,res, resaux, ressig, resant, f1, f2, f2aux, f3, aux, j) schedule (static)
+  #pragma omp parallel for private (sumacolant, sumacol, sumacolsig,res, resaux, ressig, resant, f1, f2, f2aux, f3, aux, j) schedule (static)
     
    for (i = 1; i < rows + 1; i++){
   
